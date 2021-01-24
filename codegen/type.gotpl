@@ -54,11 +54,7 @@
 					return res, graphql.ErrorOnPath(ctx, err)
 				{{- else }}
 					res, err := ec.unmarshalInput{{ $type.GQL.Name }}(ctx, v)
-					{{- if $type.IsNilable }}
-						return &res, graphql.ErrorOnPath(ctx, err)
-					{{- else}}
-						return res, graphql.ErrorOnPath(ctx, err)
-					{{- end }}
+					return res, graphql.ErrorOnPath(ctx, err)
 				{{- end }}
 			{{- end }}
 		}

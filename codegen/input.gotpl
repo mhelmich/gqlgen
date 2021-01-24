@@ -1,6 +1,6 @@
 {{- range $input := .Inputs }}
 	{{- if not .HasUnmarshal }}
-	func (ec *executionContext) unmarshalInput{{ .Name }}(ctx context.Context, obj interface{}) ({{.Type | ref}}, error) {
+	func (ec *executionContext) unmarshalInput{{ .Name }}(ctx context.Context, obj interface{}) ({{.Reference | ref}}, error) {
 		var it {{.Type | ref}}
 		var asMap = obj.(map[string]interface{})
 		{{ range $field := .Fields}}
@@ -23,7 +23,7 @@
 					{{ template "implDirectives" $field }}
 					tmp, err := directive{{$field.ImplDirectives|len}}(ctx)
 					if err != nil {
-						return it, graphql.ErrorOnPath(ctx, err)
+						return &it, graphql.ErrorOnPath(ctx, err)
 					}
 					if data, ok := tmp.({{ $field.TypeReference.GO | ref }}) ; ok {
 						it.{{$field.GoFieldName}} = data
@@ -33,19 +33,19 @@
 					{{- end }}
 					} else {
 						err := fmt.Errorf(`unexpected type %T from directive, should be {{ $field.TypeReference.GO }}`, tmp)
-						return it, graphql.ErrorOnPath(ctx, err)
+						return &it, graphql.ErrorOnPath(ctx, err)
 					}
 				{{- else }}
 					it.{{$field.GoFieldName}}, err = ec.{{ $field.TypeReference.UnmarshalFunc }}(ctx, v)
 					if err != nil {
-						return it, err
+						return &it, err
 					}
 				{{- end }}
 			{{- end }}
 			}
 		}
 
-		return it, nil
+		return &it, nil
 	}
 	{{- end }}
 {{ end }}
