@@ -16,8 +16,8 @@
 				var err error
 				res := make([]{{$type.GO.Elem | ref}}, len(vSlice))
 				for i := range vSlice {
-					ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-					res[i], err = ec.{{ $type.Elem.UnmarshalFunc }}(ctx, vSlice[i])
+					ctx0 := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+					res[i], err = ec.{{ $type.Elem.UnmarshalFunc }}(ctx0, vSlice[i])
 					if err != nil {
 						return nil, err
 					}
@@ -83,18 +83,18 @@
 							Index: &i,
 							Result: &v[i],
 						}
-						ctx := graphql.WithFieldContext(ctx, fc)
+						ctx0 := graphql.WithFieldContext(ctx, fc)
 						f := func(i int) {
 							defer func() {
                         		if r := recover(); r != nil {
-                        			ec.Error(ctx, ec.Recover(ctx, r))
+                        			ec.Error(ctx0, ec.Recover(ctx0, r))
                         			ret = nil
                         		}
                         	}()
 							if !isLen1 {
 								defer wg.Done()
 							}
-							ret[i] = ec.{{ $type.Elem.MarshalFunc }}(ctx, sel, v[i])
+							ret[i] = ec.{{ $type.Elem.MarshalFunc }}(ctx0, sel, v[i])
 						}
 						if isLen1 {
 							f(i)
